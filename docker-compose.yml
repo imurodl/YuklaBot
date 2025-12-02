@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  yuklabot:
+    build: .
+    image: imurodl/yuklabot:latest
+    container_name: yuklabot
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./temp_videos:/app/temp_videos
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/webhook || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
