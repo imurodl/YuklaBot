@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Vidzilla Bot Startup Script
+# Yukla Bot Startup Script
 
-echo "🤖 Starting Vidzilla Bot..."
+echo "🤖 Starting YuklaBot..."
 echo ""
 
 # Check if venv exists

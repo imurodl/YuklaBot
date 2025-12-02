@@ -67,7 +67,7 @@ class VidZillaBot:
         self.app.on_shutdown.append(self._on_shutdown)
 
     async def _handle_root(self, request: web.Request) -> web.Response:
-        return web.Response(text="Vidzilla Bot - FREE Version is running!")
+        return web.Response(text="Yukla Bot is running!")
 
     async def _handle_webhook_status(self, request: web.Request) -> web.Response:
         return web.Response(text="Webhook is active and working")
@@ -110,17 +110,13 @@ class VidZillaBot:
                 logger.info(f"Starting web application on {HOST}:{PORT}")
                 await site.start()
 
-                logger.info(
-                    "Vidzilla Bot - FREE Version started successfully in WEBHOOK mode!"
-                )
+                logger.info("Yukla Bot started successfully in WEBHOOK mode!")
 
                 # Run forever
                 await asyncio.Event().wait()
             else:
                 # Polling mode - start polling
-                logger.info(
-                    "Vidzilla Bot - FREE Version started successfully in POLLING mode!"
-                )
+                logger.info("Yukla Bot started successfully in POLLING mode!")
                 logger.info("Press Ctrl+C to stop the bot")
 
                 # Start polling
@@ -146,7 +142,7 @@ class VidZillaBot:
 
 
 async def main() -> None:
-    logger.info("Starting Vidzilla Bot - FREE Version")
+    logger.info("Starting Yukla Bot")
 
     bot_app = VidZillaBot()
     try:
