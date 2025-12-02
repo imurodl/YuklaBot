@@ -1,11 +1,14 @@
-# Vidzilla 🤖
+# YuklaBot 🤖
 
 **Simple bot for downloading videos from social media**
+
+> Based on [Vidzilla](https://github.com/zerox9dev/Vidzilla) - Enhanced with quality selection features
 
 ## What can the bot do?
 
 - Downloads videos from 8 popular platforms
-- Sends videos in two formats (video + file)
+- **Choose your preferred quality** before downloading
+- Audio-only extraction option
 - No download limits
 - No payments or subscriptions required
 - Simple and clean interface
@@ -19,9 +22,12 @@ YouTube • Instagram • TikTok • Facebook • Twitter • Pinterest • Redd
 
 1. **Find a video link** on any supported platform
 2. **Send the link to the bot** in Telegram
-3. **Get your video** in two formats:
-   - 🎥 Video (for watching)
-   - 📁 File (for downloading)
+3. **Select quality:**
+   - 🎵 Audio Only
+   - 📹 Low Quality (smaller file)
+   - 📹 Medium Quality
+   - � High Quality (best resolution)
+4. **Get your video** instantly!
 
 That's it! 😊
 
@@ -32,11 +38,11 @@ That's it! 😊
 
 If you want to run the bot yourself:
 
-1. **Install Python 3.8+**
+1. **Install Python 3.10+** (Python 3.9 or lower not supported)
 2. **Clone the repository:**
    ```bash
-   git clone https://github.com/zerox9dev/Vidzilla.git
-   cd Vidzilla
+   git clone https://github.com/your-username/yuklaBot.git
+   cd yuklaBot
    ```
 
 3. **Install dependencies:**
@@ -44,11 +50,25 @@ If you want to run the bot yourself:
    pip install -r requirements.txt
    ```
 
-4. **Create .env file** with settings
+4. **Create .env file** with your bot token and MongoDB settings (see `.env.example`)
+   
 5. **Run the bot:**
    ```bash
-   python bot.py
+   ./start.sh
+   # or manually:
+   python3 bot.py
    ```
+
+## New Features (vs Vidzilla)
+
+- ✨ **Quality Selection Menu** - Choose video quality before downloading
+- 🎵 **Audio Extraction** - Download audio-only from videos
+- 🚀 **Optimized Performance** - Faster downloads and better error handling
+- 📊 **File Size Display** - See file sizes when available
+
+## Credits
+
+This project is based on [Vidzilla](https://github.com/zerox9dev/Vidzilla) by [@zerox9dev](https://github.com/zerox9dev)
 
 ## License
 
