@@ -36,12 +36,17 @@ class SimpleVideoDownloader:
     async def get_video_info(self, url: str) -> Optional[Dict]:
         """Extract video information without downloading"""
         try:
+            cookiefile = os.getenv("YTDLP_COOKIES")
             options = {
                 "quiet": True,
                 "no_warnings": True,
                 "extract_flat": False,
                 "http_headers": {"User-Agent": get_random_user_agent()},
             }
+
+            if cookiefile:
+                options["cookiefile"] = cookiefile
+                logger.info(f"Using yt-dlp cookies file: {cookiefile}")
 
             def extract_info():
                 with yt_dlp.YoutubeDL(options) as ydl:
@@ -172,6 +177,7 @@ class SimpleVideoDownloader:
         self, output_path: str, format_id: Optional[str] = None
     ) -> dict:
         """Get yt-dlp options with optional format selection"""
+        cookiefile = os.getenv("YTDLP_COOKIES")
         options = {
             "outtmpl": output_path,
             "writeinfojson": False,
@@ -190,6 +196,10 @@ class SimpleVideoDownloader:
         else:
             # Default format selection
             options["format"] = "best[ext=mp4]/best/worst"
+
+        if cookiefile:
+            options["cookiefile"] = cookiefile
+            logger.info(f"Using yt-dlp cookies file for download: {cookiefile}")
 
         return options
 
