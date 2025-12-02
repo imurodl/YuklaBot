@@ -14,9 +14,14 @@ git fetch origin
 git checkout main
 git pull origin main
 
-echo "Building and starting containers..."
-docker compose build --pull
-docker compose up -d --remove-orphans
+# Ensure cookies file exists and secure permissions
+if [ -f "./cookies.txt" ]; then
+  echo "cookies.txt found, setting permissions to 600"
+  chmod 600 ./cookies.txt || true
+else
+  echo "Warning: cookies.txt not found in repo root. If required, place it at ./cookies.txt"
+fi
 
-echo "Deployment complete. Showing logs from the yuklabot container (last 50 lines):"
-docker compose logs --no-log-prefix --tail=50 yuklabot
+echo "Building and starting containers..."
+docker compose build --pull --no-cache
+docker compose up -d --remove-orphans
