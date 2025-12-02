@@ -80,15 +80,25 @@ class SimpleVideoDownloader:
         """Extract quality options from video info"""
         formats = info.get("formats", [])
 
-        # Find best audio
+        # Find best audio - check both standalone and combined formats
         audio_formats = [
             f
             for f in formats
             if f.get("acodec") != "none" and f.get("vcodec") == "none"
         ]
+        
+        # If no standalone audio, we'll extract from best combined format
         best_audio = None
         if audio_formats:
             best_audio = max(audio_formats, key=lambda f: f.get("abr", 0) or 0)
+        else:
+            # For YouTube and platforms without standalone audio, use special format
+            best_audio = {
+                "format_id": "bestaudio",
+                "ext": "m4a",
+                "acodec": "audio",
+                "vcodec": "none",
+            }
 
         # Find video formats with both video and audio
         video_formats = [
@@ -115,18 +125,17 @@ class SimpleVideoDownloader:
 
         quality_options = []
 
-        # Audio option
-        if best_audio:
-            quality_options.append(
-                {
-                    "type": "audio",
-                    "format_id": best_audio.get("format_id"),
-                    "quality": "Audio Only",
-                    "size": self.format_filesize(self.get_filesize(best_audio)),
-                    "ext": best_audio.get("ext", "m4a"),
-                    "icon": "🎵",
-                }
-            )
+        # Audio option - always add it
+        quality_options.append(
+            {
+                "type": "audio",
+                "format_id": best_audio.get("format_id"),
+                "quality": "Audio Only",
+                "size": self.format_filesize(self.get_filesize(best_audio)),
+                "ext": best_audio.get("ext", "m4a"),
+                "icon": "🎵",
+            }
+        )
 
         # Get Low, Medium, High quality
         if len(video_formats) > 0:
@@ -192,7 +201,17 @@ class SimpleVideoDownloader:
 
         if format_id:
             # Download specific format
-            options["format"] = format_id
+            if format_id == "bestaudio":
+                # For audio extraction, use bestaudio format and convert to m4a
+                options["format"] = "bestaudio/best"
+                options["postprocessors"] = [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "m4a",
+                    }
+                ]
+            else:
+                options["format"] = format_id
         else:
             # Default format selection
             options["format"] = "best[ext=mp4]/best/worst"
@@ -338,11 +357,68 @@ async def process_social_media_video(
 async def send_video_with_fallback(bot, message, video_path: str, platform_name: str):
     """Send video as video format, with document as fallback if video fails"""
 
-    # Try to send as video first
+    # Try to send as video first with proper metadata
     try:
+        import subprocess
+        import json
+        
+        # Get video metadata using ffprobe
+        try:
+            result = subprocess.run(
+                [
+                    "ffprobe",
+                    "-v", "quiet",
+                    "-print_format", "json",
+                    "-show_format",
+                    "-show_streams",
+                    video_path
+                ],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            if result.returncode == 0:
+                metadata = json.loads(result.stdout)
+                video_stream = next(
+                    (s for s in metadata.get("streams", []) if s.get("codec_type") == "video"),
+                    None
+                )
+                
+                width = None
+                height = None
+                duration = None
+                
+                if video_stream:
+                    width = video_stream.get("width")
+                    height = video_stream.get("height")
+                
+                format_info = metadata.get("format", {})
+                if format_info.get("duration"):
+                    duration = int(float(format_info["duration"]))
+                
+                video_file = FSInputFile(video_path)
+                await bot.send_video(
+                    chat_id=message.chat.id,
+                    video=video_file,
+                    width=width,
+                    height=height,
+                    duration=duration,
+                    supports_streaming=True
+                )
+                logger.info(f"Video sent successfully as video (metadata: {width}x{height}, {duration}s)")
+                return
+            else:
+                logger.warning("ffprobe failed, sending without metadata")
+        except Exception as probe_error:
+            logger.warning(f"Could not probe video metadata: {probe_error}")
+        
+        # Fallback: send without metadata
         video_file = FSInputFile(video_path)
         await bot.send_video(
-            chat_id=message.chat.id, video=video_file, supports_streaming=True
+            chat_id=message.chat.id,
+            video=video_file,
+            supports_streaming=True
         )
         logger.info("Video sent successfully as video")
         return
