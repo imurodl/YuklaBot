@@ -20,9 +20,9 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy application
 COPY . /app
 
-# Create non-root user
-RUN useradd -m botuser && chown -R botuser:botuser /app
-USER botuser
+# Create non-root user (commented out to avoid permission issues with mounted files)
+# RUN useradd -m botuser && chown -R botuser:botuser /app
+# USER botuser
 
 EXPOSE 8000
 CMD ["python3", "bot.py"]
