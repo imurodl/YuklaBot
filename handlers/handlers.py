@@ -30,12 +30,12 @@ class DownloadVideo(StatesGroup):
 async def send_welcome(message: Message, state: FSMContext):
     # Ensure user exists in database
     ensure_user_exists(message)
-    welcome_text = "👋 Hi!\n\n📥 I help you download videos and photos from Instagram, TikTok, YouTube and Pinterest —\nwithout watermarks and in the best quality!\n\n📎 Just send a link — and get video in a couple of seconds!\n\n🤖 Also check @DockMixAIbot — AI GPT + Claude assistant!"
+    welcome_text = "👋 Assalomu aleykum!\n\n📥 Instagram, TikTok, YouTube va Pinterest'dan video yuklab olishingiz mumkin.\n\n📎 Havola yuboring va videoni oling!\n\n👨‍💻 Murojaat uchun: @imurodl"
 
     await message.answer(welcome_text, parse_mode="Markdown")
 
 
-@handle_errors("Error\nTry another link")
+@handle_errors("Xatolik\nBoshqa havola yuboring")
 async def process_video_link(message: Message, state: FSMContext):
     # Ensure user exists in database
     user = ensure_user_exists(message)
@@ -47,7 +47,7 @@ async def process_video_link(message: Message, state: FSMContext):
         return
 
     # Send processing message
-    progress_msg = await message.answer("Loading...")
+    progress_msg = await message.answer("Yuklanmoqda...")
 
     # Detect platform and process video
     platform_detected = await detect_platform_and_process(
@@ -58,7 +58,7 @@ async def process_video_link(message: Message, state: FSMContext):
         # Platform not supported
         supported_platforms = ", ".join(set(PLATFORM_IDENTIFIERS.values()))
         await progress_msg.edit_text(
-            f"Platform not supported\n\n{supported_platforms}", parse_mode="Markdown"
+            f"❌ Bu platforma qo'llab-quvvatlanmaydi\n\n✅ Qo'llab-quvvatlanadigan platformalar:\n{supported_platforms}", parse_mode="Markdown"
         )
         return
 

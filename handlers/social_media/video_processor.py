@@ -41,6 +41,7 @@ class SimpleVideoDownloader:
                 "quiet": True,
                 "no_warnings": True,
                 "extract_flat": False,
+                "skip_download": True,  # Only get info, don't download
                 "http_headers": {"User-Agent": get_random_user_agent()},
             }
 
@@ -203,7 +204,7 @@ class SimpleVideoDownloader:
             # Download specific format
             if format_id == "bestaudio":
                 # For audio extraction, use bestaudio format and convert to m4a
-                options["format"] = "bestaudio/best"
+                options["format"] = "bestaudio[ext=m4a]/bestaudio"
                 options["postprocessors"] = [
                     {
                         "key": "FFmpegExtractAudio",
@@ -211,7 +212,10 @@ class SimpleVideoDownloader:
                     }
                 ]
             else:
+                # Download exact format (no merging)
                 options["format"] = format_id
+                # Prefer formats that don't need post-processing
+                options["merge_output_format"] = "mp4"
         else:
             # Default format selection
             options["format"] = "best[ext=mp4]/best/worst"
@@ -287,7 +291,7 @@ async def process_social_media_video(
     try:
         # Update progress
         if progress_msg:
-            await safe_edit_message(progress_msg, f"Downloading...")
+            await safe_edit_message(progress_msg, f"Yuklanmoqda...")
 
         # Download video
         temp_video_path = await downloader.download_video(
@@ -302,12 +306,12 @@ async def process_social_media_video(
         logger.info(f"{platform_name} video size: {file_size_mb:.2f}MB")
 
         if progress_msg:
-            await safe_edit_message(progress_msg, f"Checking...")
+            await safe_edit_message(progress_msg, f"Tekshirilmoqda...")
 
         # Check Telegram size limit
         if file_size_mb > TELEGRAM_VIDEO_SIZE_LIMIT_MB:
             # Video is too large for Telegram
-            size_limit_message = f"Too large ({file_size_mb:.1f}MB)\nLimit: {TELEGRAM_VIDEO_SIZE_LIMIT_MB}MB"
+            size_limit_message = f"Juda katta ({file_size_mb:.1f}MB)\nLimiti: {TELEGRAM_VIDEO_SIZE_LIMIT_MB}MB"
 
             if progress_msg:
                 await safe_edit_message(progress_msg, size_limit_message)
@@ -320,7 +324,7 @@ async def process_social_media_video(
             return
 
         if progress_msg:
-            await safe_edit_message(progress_msg, f"Sending video & document...")
+            await safe_edit_message(progress_msg, f"Yuborilmoqda...")
 
         # Send video and document in media group (it's within size limit)
         await send_video_with_fallback(bot, message, temp_video_path, platform_name)
@@ -328,7 +332,7 @@ async def process_social_media_video(
         # Success message
         if progress_msg:
             await safe_edit_message(
-                progress_msg, f"Sent video & document! ({file_size_mb:.1f}MB)"
+                progress_msg, f"Tayyor! ({file_size_mb:.1f}MB)"
             )
 
         logger.info(f"{platform_name} video processed successfully")
@@ -337,7 +341,7 @@ async def process_social_media_video(
         logger.error(f"Error processing {platform_name} video: {str(e)}")
 
         # Simple error message
-        error_message = "Error\nTry another link"
+        error_message = "Xatolik\nBoshqa havola yuboring"
 
         if progress_msg:
             await safe_edit_message(progress_msg, error_message)
