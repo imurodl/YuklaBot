@@ -10,7 +10,7 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./temp_videos:/app/temp_videos
-      - ./cookies.txt:/app/cookies.txt:ro
+      - ./cookies.txt:/app/cookies.txt
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/webhook || exit 1"]
       interval: 1m
