@@ -42,6 +42,8 @@ class SimpleVideoDownloader:
                 "no_warnings": True,
                 "extract_flat": False,
                 "http_headers": {"User-Agent": get_random_user_agent()},
+                # Workaround for YouTube extraction without JS runtime
+                "extractor_args": {"youtube": {"player_client": ["ios", "web"]}},
             }
 
             if cookiefile:
@@ -197,6 +199,8 @@ class SimpleVideoDownloader:
             "extract_flat": False,
             "writethumbnail": False,
             "writeautomaticsub": False,
+            # Workaround for YouTube extraction without JS runtime
+            "extractor_args": {"youtube": {"player_client": ["ios", "web"]}},
         }
 
         if format_id:
