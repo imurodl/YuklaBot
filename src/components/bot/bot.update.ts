@@ -1,6 +1,6 @@
 import { Update, Start, Help, On, Ctx } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
-import { MESSAGES } from '../../libs/constants/messages.constant';
+import { MESSAGES } from '../../libs/enums/messages.enum';
 import { VideoService } from '../video/video.service';
 
 @Update()

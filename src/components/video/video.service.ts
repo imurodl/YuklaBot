@@ -4,8 +4,8 @@ import { Context } from 'telegraf';
 import {
   PLATFORM_IDENTIFIERS,
   SUPPORTED_PLATFORMS,
-} from '../../libs/constants/platforms.constant';
-import { MESSAGES } from '../../libs/constants/messages.constant';
+} from '../../libs/enums/platforms.enum';
+import { MESSAGES } from '../../libs/enums/messages.enum';
 import { QualityService } from './quality.service';
 
 @Injectable()

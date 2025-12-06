@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Context, Markup } from 'telegraf';
 import YTDlpWrap from 'yt-dlp-wrap';
 import { ConfigService } from '@nestjs/config';
-import { MESSAGES } from '../../libs/constants/messages.constant';
+import { MESSAGES } from '../../libs/enums/messages.enum';
 
 interface VideoInfo {
   formats: any[];
