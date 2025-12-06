@@ -1,18 +1,45 @@
 services:
   yuklabot:
     build: .
-    image: imurodl/yuklabot:latest
+    image: imurodl/yuklabot:nest
     container_name: yuklabot
     restart: always
     env_file:
       - .env
     ports:
-      - "127.0.0.1:8000:8000"
+      - '127.0.0.1:8002:8002'
     volumes:
-      - ./temp_videos:/app/temp_videos
-      - ./cookies.txt:/app/cookies.txt
+      - ./cookies.txt:/app/cookies.txt:ro
+      - /tmp/yuklabot:/tmp/yuklabot
+    environment:
+      - NODE_ENV=production
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/webhook || exit 1"]
-      interval: 1m
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:8002/health || exit 1',
+        ]
+      interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+
+  # Optional: Local Bot API for 2GB file support
+  # telegram-bot-api:
+  #   image: aiogram/telegram-bot-api:latest
+  #   container_name: telegram-bot-api
+  #   restart: always
+  #   environment:
+  #     TELEGRAM_API_ID: ${TELEGRAM_API_ID}
+  #     TELEGRAM_API_HASH: ${TELEGRAM_API_HASH}
+  #   ports:
+  #     - "127.0.0.1:8081:8081"
+  #   volumes:
+  #     - telegram-bot-api-data:/var/lib/telegram-bot-api
+
+# volumes:
+#   telegram-bot-api-data:

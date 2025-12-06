@@ -1,28 +1,51 @@
-FROM python:3.11-slim
-
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# system deps (ffmpeg for processing, build tools for some wheels)
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ffmpeg \
-        build-essential \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Stage 1: Build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install Python dependencies first for better caching
-COPY requirements.txt /app/
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
 
-# Copy application
-COPY . /app
+# Copy source code
+COPY . .
 
-# Create non-root user (commented out to avoid permission issues with mounted files)
-# RUN useradd -m botuser && chown -R botuser:botuser /app
-# USER botuser
+# Build the application
+RUN npm run build
 
-EXPOSE 8000
-CMD ["python3", "bot.py"]
+# Stage 2: Production
+FROM node:20-alpine
+
+# Install ffmpeg and yt-dlp
+RUN apk add --no-cache ffmpeg python3 py3-pip && \
+    pip3 install --break-system-packages yt-dlp
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
+
+# Copy necessary files
+COPY cookies.txt* ./
+
+# Create temp directory
+RUN mkdir -p /tmp/yuklabot && chmod 777 /tmp/yuklabot
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Change ownership
+RUN chown -R nodejs:nodejs /app /tmp/yuklabot
+
+USER nodejs
+
+EXPOSE 8002
+
+CMD ["node", "dist/main"]
