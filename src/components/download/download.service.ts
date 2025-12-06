@@ -49,7 +49,11 @@ export class DownloadService {
     const outputPath = this.generateOutputPath(userId, platform, formatId);
 
     try {
-      const downloadOptions = this.buildDownloadOptions(url, formatId, outputPath);
+      const downloadOptions = this.buildDownloadOptions(
+        url,
+        formatId,
+        outputPath,
+      );
 
       // Execute yt-dlp download
       await this.ytdlp.downloadAsync(url, downloadOptions);
@@ -98,11 +102,7 @@ export class DownloadService {
       output: outputPath,
     };
 
-    // Add cookies if available
-    if (existsSync(this.cookiesPath)) {
-      options.cookies = this.cookiesPath;
-      this.logger.debug(`Using cookies from: ${this.cookiesPath}`);
-    }
+    options.cookiesFromBrowser = 'firefox';
 
     // Set format based on selection
     if (formatId) {

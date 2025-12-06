@@ -17,7 +17,7 @@ RUN npm run build
 FROM node:20-alpine
 
 # Install ffmpeg and yt-dlp
-RUN apk add --no-cache ffmpeg python3 py3-pip && \
+RUN apk add --no-cache ffmpeg python3 py3-pip firefox && \
     pip3 install --break-system-packages yt-dlp
 
 WORKDIR /app

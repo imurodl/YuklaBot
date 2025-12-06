@@ -32,14 +32,9 @@ export class QualityService {
    */
   async getVideoInfo(url: string): Promise<VideoInfo | null> {
     try {
-      const cookiesPath = this.configService.get<string>('ytdlp.cookiesPath');
-
       const options: any = {};
 
-      if (cookiesPath) {
-        // Note: ytdlp-nodejs uses cookies option, not command line flag
-        options.cookies = cookiesPath;
-      }
+      options.cookiesFromBrowser = 'firefox';
 
       const info = await this.ytDlp.getInfoAsync(url, options);
 
