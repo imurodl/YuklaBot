@@ -100,9 +100,8 @@ export class DownloadService {
   ): any {
     const options: any = {
       output: outputPath,
+      cookiesFromBrowser: 'firefox',
     };
-
-    options.cookiesFromBrowser = 'firefox';
 
     // Set format based on selection
     if (formatId) {

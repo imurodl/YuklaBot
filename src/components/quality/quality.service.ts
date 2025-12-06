@@ -32,9 +32,9 @@ export class QualityService {
    */
   async getVideoInfo(url: string): Promise<VideoInfo | null> {
     try {
-      const options: any = {};
-
-      options.cookiesFromBrowser = 'firefox';
+      const options: any = {
+        cookiesFromBrowser: 'firefox',
+      };
 
       const info = await this.ytDlp.getInfoAsync(url, options);
 
