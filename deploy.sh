@@ -18,10 +18,12 @@ git fetch origin
 git checkout main
 git pull origin main
 
-# Ensure cookies file exists and has secure permissions
+# Ensure cookies file exists and has correct permissions for container
 if [ -f "./cookies.txt" ]; then
-  echo "✅ cookies.txt found, setting permissions to 600"
-  chmod 600 ./cookies.txt || true
+  echo "✅ cookies.txt found, setting ownership and permissions"
+  # UID 1001 matches the nodejs user in the container
+  chown 1001:1001 ./cookies.txt || true
+  chmod 666 ./cookies.txt || true
 else
   echo "⚠️  Warning: cookies.txt not found. YouTube downloads may require authentication."
 fi

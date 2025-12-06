@@ -104,10 +104,10 @@ export class DownloadService {
 
     if (formatId) {
       if (formatId === 'bestaudio') {
-        // For audio extraction
+        // For audio extraction - use broader fallback chain
         args.push(
           '-f',
-          'bestaudio[ext=m4a]/bestaudio',
+          'bestaudio[ext=m4a]/bestaudio/best[height<=480]',
           '-x',
           '--audio-format',
           'm4a',
