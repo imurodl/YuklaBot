@@ -11,6 +11,7 @@ services:
     volumes:
       - ./cookies.txt:/app/cookies.txt
       - /tmp/yuklabot:/tmp/yuklabot
+      - /root/.mozilla/firefox:/root/.mozilla/firefox:ro
     environment:
       - NODE_ENV=production
     healthcheck:
