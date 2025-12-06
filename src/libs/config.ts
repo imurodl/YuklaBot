@@ -4,7 +4,10 @@ export default () => ({
     token: process.env.BOT_TOKEN || '',
     webhookPath: process.env.WEBHOOK_PATH || '',
     webhookUrl: process.env.WEBHOOK_URL || '',
-    localBotApiUrl: process.env.LOCAL_BOT_API_URL || 'http://localhost:8081',
+    localApiUrl:
+      process.env.TELEGRAM_API_ID && process.env.TELEGRAM_API_HASH
+        ? process.env.LOCAL_BOT_API_URL || 'http://telegram-bot-api:8081'
+        : '',
   },
   mongodb: {
     uri: process.env.MONGODB_URI,

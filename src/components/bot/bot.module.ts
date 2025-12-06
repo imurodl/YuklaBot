@@ -13,6 +13,7 @@ import { BotUpdate } from './bot.update';
         const token = configService.get<string>('bot.token');
         const webhookUrl = configService.get<string>('bot.webhookUrl');
         const webhookPath = configService.get<string>('bot.webhookPath');
+        const localBotApiUrl = configService.get<string>('bot.localApiUrl');
 
         if (!token) {
           throw new Error('BOT_TOKEN is not defined in environment variables');
@@ -21,6 +22,13 @@ import { BotUpdate } from './bot.update';
         const options: any = {
           token,
         };
+
+        // Use Local Bot API if configured (for 2GB file support)
+        if (localBotApiUrl) {
+          options.options = {
+            apiRoot: localBotApiUrl,
+          };
+        }
 
         // Use webhook if configured, otherwise polling
         if (webhookUrl && webhookPath) {

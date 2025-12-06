@@ -125,13 +125,77 @@ docker-compose down
 
 ### Environment Variables
 
-| Variable            | Description                                 | Default       |
-| ------------------- | ------------------------------------------- | ------------- |
-| `BOT_TOKEN`         | Telegram Bot Token (required)               | -             |
-| `PORT`              | Application port                            | 8000          |
-| `YTDLP_COOKIES`     | Path to cookies.txt for YouTube auth        | ./cookies.txt |
-| `LOCAL_BOT_API_URL` | Local Bot API URL (optional, for 2GB files) | -             |
-| `MONGODB_URI`       | MongoDB connection string (optional)        | -             |
+| Variable            | Description                                     | Default                      |
+| ------------------- | ----------------------------------------------- | ---------------------------- |
+| `BOT_TOKEN`         | Telegram Bot Token (required)                   | -                            |
+| `PORT`              | Application port                                | 8000                         |
+| `WEBHOOK_PATH`      | Webhook path (for production)                   | -                            |
+| `WEBHOOK_URL`       | Webhook domain (for production)                 | -                            |
+| `YTDLP_COOKIES`     | Path to cookies.txt for YouTube auth            | ./cookies.txt                |
+| `TELEGRAM_API_ID`   | Telegram API ID (for Local Bot API)             | -                            |
+| `TELEGRAM_API_HASH` | Telegram API Hash (for Local Bot API)           | -                            |
+| `LOCAL_BOT_API_URL` | Local Bot API URL (for 2GB file support)        | http://telegram-bot-api:8081 |
+| `MONGODB_URI`       | MongoDB connection string (optional)            | -                            |
+| `ADMIN_IDS`         | Comma-separated list of admin Telegram user IDs | -                            |
+
+### Local Bot API Setup (2GB File Support)
+
+By default, Telegram bots can only send files up to 50MB. To enable **2GB file support**, you need to set up a Local Bot API server.
+
+#### Step 1: Get Telegram API Credentials
+
+1. Go to https://my.telegram.org/auth
+2. Log in with your phone number
+3. Navigate to "API development tools"
+4. Create a new application (or use existing)
+5. Copy your `api_id` and `api_hash`
+
+#### Step 2: Configure Environment Variables
+
+Add to your `.env` file:
+
+```env
+TELEGRAM_API_ID=your_api_id_here
+TELEGRAM_API_HASH=your_api_hash_here
+```
+
+#### Step 3: Deploy with Local Bot API
+
+The `telegram-bot-api` service will automatically start when you have API credentials set:
+
+```bash
+docker-compose up -d
+```
+
+#### Step 4: Logout Bot from Official Server
+
+After starting the Local Bot API, you need to logout your bot from Telegram's official servers:
+
+```bash
+# Get your bot token
+TOKEN="your_bot_token_here"
+
+# Logout from official servers
+curl "https://api.telegram.org/bot${TOKEN}/logOut"
+
+# Verify local API is working
+docker-compose logs telegram-bot-api
+```
+
+**Important Notes:**
+
+- Once you logout from official servers, your bot will ONLY work through the Local Bot API
+- Make sure the Local Bot API container is always running
+- The bot can now send files up to 2GB
+- File size limit automatically changes from 50MB → 2GB when Local Bot API is enabled
+
+#### Reverting to Official API
+
+If you want to go back to the official API:
+
+1. Remove `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` from `.env`
+2. Stop the Local Bot API: `docker-compose stop telegram-bot-api`
+3. The bot will automatically reconnect to official Telegram servers on next restart
 
 ## Architecture
 
