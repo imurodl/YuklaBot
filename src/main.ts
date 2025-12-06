@@ -19,7 +19,7 @@ async function bootstrap() {
       console.log(`[WEBHOOK] Received ${req.method} request to ${req.url}`);
       next();
     });
-    
+
     app.use(bot.webhookCallback(webhookPath));
     console.log(
       `Webhook will be available at: https://${webhookDomain}${webhookPath}`,
@@ -30,7 +30,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  
+
   console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();

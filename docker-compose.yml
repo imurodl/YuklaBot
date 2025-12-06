@@ -9,7 +9,7 @@ services:
     ports:
       - '127.0.0.1:8000:8000'
     volumes:
-      - ./cookies.txt:/app/cookies.txt:ro
+      - ./cookies.txt:/app/cookies.txt
       - /tmp/yuklabot:/tmp/yuklabot
     environment:
       - NODE_ENV=production
