@@ -24,12 +24,9 @@ import { BotUpdate } from './bot.update';
 
         // Use webhook if configured, otherwise polling
         if (webhookUrl && webhookPath) {
-          // Extract domain from full URL (remove https://)
-          const domain = webhookUrl.replace(/^https?:\/\//, '');
-          
           options.launchOptions = {
             webhook: {
-              domain: domain.replace(webhookPath, ''), // Remove path from domain
+              domain: webhookUrl,
               hookPath: webhookPath,
             },
           };
