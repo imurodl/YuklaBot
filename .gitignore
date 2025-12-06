@@ -1,87 +1,58 @@
-# Environment
-.myenv/
-.myebv/
-.env
-.env.local
-.env.production
-venv
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-coverage.xml
-coverage.html
-coverage.json
-.tox/
-.nox/
+# compiled output
+/dist
+/node_modules
+/build
 
 # Logs
+logs
 *.log
-logs/
-temp_videos/
-compression.log
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-# Kiro IDE
-.kiro/
+# Tests
+/coverage
+/.nyc_output
 
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# SSL certificates
-ssl/
-*.pem
-*.key
-*.crt
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
 
-# Temporary files
-test.py
-*.tmp
-*.temp
+# temp directory
+.temp
+.tmp
 
-# Database
-*.db
-*.sqlite3
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Backup files
-*.bak
-*.backup
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 cookies.txt
