@@ -3,6 +3,9 @@ import { Context, Markup } from 'telegraf';
 import YTDlpWrap from 'yt-dlp-wrap';
 import { ConfigService } from '@nestjs/config';
 import { MESSAGES } from '../../libs/enums/messages.enum';
+import { DownloadService } from '../download/download.service';
+import { UploadService } from '../upload/upload.service';
+import { getFileSizeMB } from '../../libs/utils/file.util';
 
 interface VideoInfo {
   formats: any[];
@@ -23,9 +26,17 @@ export class QualityService {
   private readonly logger = new Logger(QualityService.name);
   private readonly ytDlp: YTDlpWrap;
   private readonly downloadUrls: Map<number, string> = new Map();
+  private readonly fileSizeLimit: number;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly downloadService: DownloadService,
+    private readonly uploadService: UploadService,
+  ) {
     this.ytDlp = new YTDlpWrap();
+    this.fileSizeLimit =
+      this.configService.get<number>('telegram.fileSizeLimit') ||
+      50 * 1024 * 1024; // Default 50MB
   }
 
   async showQualitySelection(
@@ -118,18 +129,61 @@ export class QualityService {
     // Update message
     await ctx.editMessageText(MESSAGES.DOWNLOADING);
 
-    try {
-      // TODO: Implement download and send logic
-      this.logger.log(`Downloading ${platform} video, format: ${formatId}`);
+    let downloadedFilePath: string | null = null;
 
-      // For now, just show success message
-      await ctx.editMessageText('Video yuklanmoqda... (hali tugallanmagan)');
+    try {
+      // Download video
+      const downloadResult = await this.downloadService.downloadVideo({
+        url,
+        formatId,
+        userId,
+        platform,
+      });
+
+      downloadedFilePath = downloadResult.filePath;
+      const fileSizeMB = downloadResult.fileSize / (1024 * 1024);
+
+      this.logger.log(
+        `Downloaded: ${downloadedFilePath}, Size: ${fileSizeMB.toFixed(2)}MB`,
+      );
+
+      // Update progress
+      await ctx.editMessageText(MESSAGES.CHECKING);
+
+      // Check file size limit
+      const limitMB = this.fileSizeLimit / (1024 * 1024);
+      if (fileSizeMB > limitMB) {
+        await ctx.editMessageText(MESSAGES.TOO_LARGE(fileSizeMB, limitMB));
+        this.logger.warn(`File too large: ${fileSizeMB}MB > ${limitMB}MB`);
+        return;
+      }
+
+      // Upload to Telegram
+      await ctx.editMessageText(MESSAGES.SENDING);
+
+      await this.uploadService.uploadFile({
+        ctx,
+        filePath: downloadedFilePath,
+        platform,
+        width: downloadResult.width,
+        height: downloadResult.height,
+        duration: downloadResult.duration,
+        isAudio: downloadResult.isAudio,
+      });
+
+      // Success!
+      await ctx.editMessageText(MESSAGES.SUCCESS(fileSizeMB));
 
       // Clean up stored URL
       this.downloadUrls.delete(userId);
     } catch (error) {
       this.logger.error(`Error processing download: ${error.message}`);
       await ctx.editMessageText(MESSAGES.ERROR);
+    } finally {
+      // Cleanup downloaded file
+      if (downloadedFilePath) {
+        await this.downloadService.cleanup(downloadedFilePath);
+      }
     }
   }
 
