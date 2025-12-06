@@ -126,7 +126,7 @@ Rebuild YuklaBot in NestJS with Local Bot API for better performance and 2GB fil
 ## Phase 5: Testing & Deployment (Day 5-6)
 
 - [ ] Local testing with test bot
-- [ ] Deploy to VPS (port 8002)
+- [ ] Deploy to VPS (port 8000)
 - [ ] Update nginx for new upstream
 - [ ] Parallel testing (both bots)
 - [ ] Switch production traffic
@@ -221,7 +221,7 @@ Flow:
 ### Infrastructure
 
 - Local Bot API Server (Docker, port 8081)
-- NestJS App (port 8002)
+- NestJS App (port 8000)
 - Nginx reverse proxy
 - MongoDB (existing)
 
@@ -279,10 +279,10 @@ Flow:
 
 ### Deployment
 
-- [ ] Deploy to VPS (port 8002)
+- [ ] Deploy to VPS (port 8000)
 - [ ] Set up Local Bot API Docker container
 - [ ] Test with production token
-- [ ] Update nginx to point to port 8002
+- [ ] Update nginx to point to port 8000
 - [ ] Monitor errors for 24-48 hours
 - [ ] Verify 2GB file limit works
 
@@ -299,7 +299,7 @@ Flow:
 - ✅ Project moved to root - proper NestJS structure
 - ✅ Configuration migrated to libs/config.ts
 - ✅ Constants moved to libs/enums/
-- Port 8002 for production deployment
+- Port 8000 for production deployment
 - Local Bot API will run on port 8081
 - Test with large files (>50MB) to verify Local Bot API works
 - Cookie management strategy stays the same (cookies.txt)
@@ -434,7 +434,7 @@ npm run test
 
 ```env
 BOT_TOKEN=your_bot_token
-PORT=8002
+PORT=8000
 YTDLP_COOKIES=./cookies.txt
 LOCAL_BOT_API_URL=http://localhost:8081  # For Phase 4
 ```

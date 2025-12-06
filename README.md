@@ -92,7 +92,7 @@ That's it! 😊
 
    ```bash
    BOT_TOKEN=your_bot_token_here
-   PORT=8002
+   PORT=8000
    YTDLP_COOKIES=./cookies.txt
    ```
 
@@ -128,7 +128,7 @@ docker-compose down
 | Variable            | Description                                 | Default       |
 | ------------------- | ------------------------------------------- | ------------- |
 | `BOT_TOKEN`         | Telegram Bot Token (required)               | -             |
-| `PORT`              | Application port                            | 8002          |
+| `PORT`              | Application port                            | 8000          |
 | `YTDLP_COOKIES`     | Path to cookies.txt for YouTube auth        | ./cookies.txt |
 | `LOCAL_BOT_API_URL` | Local Bot API URL (optional, for 2GB files) | -             |
 | `MONGODB_URI`       | MongoDB connection string (optional)        | -             |

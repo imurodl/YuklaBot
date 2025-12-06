@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - '127.0.0.1:8002:8002'
+      - '127.0.0.1:8000:8000'
     volumes:
       - ./cookies.txt:/app/cookies.txt:ro
       - /tmp/yuklabot:/tmp/yuklabot
@@ -21,7 +21,7 @@ services:
           '--no-verbose',
           '--tries=1',
           '--spider',
-          'http://localhost:8002/health || exit 1',
+          'http://localhost:8000/health || exit 1',
         ]
       interval: 30s
       timeout: 10s

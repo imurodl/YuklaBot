@@ -46,6 +46,6 @@ RUN chown -R nodejs:nodejs /app /tmp/yuklabot
 
 USER nodejs
 
-EXPOSE 8002
+EXPOSE 8000
 
 CMD ["node", "dist/main"]

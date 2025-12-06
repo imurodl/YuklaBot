@@ -1,5 +1,5 @@
 export default () => ({
-  port: parseInt(process.env.PORT || '8002', 10),
+  port: parseInt(process.env.PORT || '8000', 10),
   bot: {
     token: process.env.BOT_TOKEN || '',
     webhookPath: process.env.WEBHOOK_PATH || '',
