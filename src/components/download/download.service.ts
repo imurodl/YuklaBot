@@ -113,8 +113,8 @@ export class DownloadService {
           'm4a',
         );
       } else {
-        // For specific video format
-        args.push('-f', formatId);
+        // For specific video format - add fallback to best quality
+        args.push('-f', `${formatId}/best[ext=mp4]/best`);
       }
     } else {
       // Default: best quality
