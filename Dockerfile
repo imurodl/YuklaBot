@@ -37,12 +37,15 @@ COPY cookies.txt* ./
 # Create temp directory
 RUN mkdir -p /tmp/yuklabot && chmod 777 /tmp/yuklabot
 
+# Create Firefox profile directory for nodejs user
+RUN mkdir -p /home/nodejs/.mozilla/firefox && chmod 755 /home/nodejs/.mozilla/firefox
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Change ownership
-RUN chown -R nodejs:nodejs /app /tmp/yuklabot
+RUN chown -R nodejs:nodejs /app /tmp/yuklabot /home/nodejs/.mozilla
 
 USER nodejs
 
