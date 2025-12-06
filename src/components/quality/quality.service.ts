@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import YTDlpWrap from 'yt-dlp-wrap';
+import { YtDlp } from 'ytdlp-nodejs';
 import { ConfigService } from '@nestjs/config';
 
 export interface VideoInfo {
@@ -21,10 +21,10 @@ export interface QualityOption {
 @Injectable()
 export class QualityService {
   private readonly logger = new Logger(QualityService.name);
-  private readonly ytDlp: YTDlpWrap;
+  private readonly ytDlp: YtDlp;
 
   constructor(private readonly configService: ConfigService) {
-    this.ytDlp = new YTDlpWrap();
+    this.ytDlp = new YtDlp();
   }
 
   /**
@@ -34,16 +34,22 @@ export class QualityService {
     try {
       const cookiesPath = this.configService.get<string>('ytdlp.cookiesPath');
 
-      const options = ['--dump-json', '--no-warnings', '--skip-download'];
+      const options: any = {};
 
       if (cookiesPath) {
-        options.push('--cookies', cookiesPath);
+        // Note: ytdlp-nodejs uses cookies option, not command line flag
+        options.cookies = cookiesPath;
       }
 
-      const output = await this.ytDlp.execPromise([...options, url]);
-      const info = JSON.parse(output);
+      const info = await this.ytDlp.getInfoAsync(url, options);
 
-      return info;
+      // Handle both video and playlist types
+      if (info._type === 'playlist') {
+        this.logger.warn('Playlist detected, using first video');
+        return info.entries?.[0] || null;
+      }
+
+      return info as VideoInfo;
     } catch (error) {
       this.logger.error(`Error extracting video info: ${error.message}`);
       return null;

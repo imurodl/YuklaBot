@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import YTDlpWrap from 'yt-dlp-wrap';
+import { YtDlp } from 'ytdlp-nodejs';
 import { spawn } from 'child_process';
 import { unlink } from 'fs/promises';
 import * as path from 'path';
@@ -25,12 +25,12 @@ export interface DownloadResult {
 @Injectable()
 export class DownloadService {
   private readonly logger = new Logger(DownloadService.name);
-  private readonly ytdlp: YTDlpWrap;
+  private readonly ytdlp: YtDlp;
   private readonly cookiesPath: string;
   private readonly tempDir: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.ytdlp = new YTDlpWrap();
+    this.ytdlp = new YtDlp();
     this.cookiesPath =
       this.configService.get<string>('ytdlp.cookiesPath') || './cookies.txt';
     this.tempDir = '/tmp';
@@ -49,10 +49,10 @@ export class DownloadService {
     const outputPath = this.generateOutputPath(userId, platform, formatId);
 
     try {
-      const ytdlpArgs = this.buildYtdlpArgs(url, formatId, outputPath);
+      const downloadOptions = this.buildDownloadOptions(url, formatId, outputPath);
 
       // Execute yt-dlp download
-      await this.ytdlp.execPromise(ytdlpArgs);
+      await this.ytdlp.downloadAsync(url, downloadOptions);
 
       // Find the actual downloaded file
       const actualFilePath = this.findDownloadedFile(outputPath);
@@ -87,41 +87,40 @@ export class DownloadService {
   }
 
   /**
-   * Build yt-dlp arguments based on format selection
+   * Build download options for ytdlp-nodejs
    */
-  private buildYtdlpArgs(
+  private buildDownloadOptions(
     url: string,
     formatId: string | undefined,
     outputPath: string,
-  ): string[] {
-    const args = [url, '-o', outputPath, '--no-playlist', '--no-warnings'];
+  ): any {
+    const options: any = {
+      output: outputPath,
+    };
 
     // Add cookies if available
     if (existsSync(this.cookiesPath)) {
-      args.push('--cookies', this.cookiesPath);
+      options.cookies = this.cookiesPath;
       this.logger.debug(`Using cookies from: ${this.cookiesPath}`);
     }
 
+    // Set format based on selection
     if (formatId) {
       if (formatId === 'bestaudio') {
-        // For audio extraction - use broader fallback chain
-        args.push(
-          '-f',
-          'bestaudio[ext=m4a]/bestaudio/best[height<=480]',
-          '-x',
-          '--audio-format',
-          'm4a',
-        );
+        // For audio extraction
+        options.format = 'bestaudio[ext=m4a]/bestaudio/best[height<=480]';
+        options.extractAudio = true;
+        options.audioFormat = 'm4a';
       } else {
         // For specific video format - add fallback to best quality
-        args.push('-f', `${formatId}/best[ext=mp4]/best`);
+        options.format = `${formatId}/best[ext=mp4]/best`;
       }
     } else {
       // Default: best quality
-      args.push('-f', 'best[ext=mp4]/best');
+      options.format = 'best[ext=mp4]/best';
     }
 
-    return args;
+    return options;
   }
 
   /**
